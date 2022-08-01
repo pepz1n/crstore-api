@@ -1,4 +1,4 @@
-import User from "../models/User";
+import User from "../models/UserModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -23,7 +23,7 @@ const getAll = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    let { username, name, phone, password, role } = req.body;
+    let { username, name, phone, password, role, cpf } = req.body;
 
     let userExists = await User.findOne({
       where: {
@@ -45,7 +45,8 @@ const register = async (req, res) => {
       name,
       phone,
       passwordHash,
-      role
+      role,
+      cpf
     });
 
     return res.status(200).send({

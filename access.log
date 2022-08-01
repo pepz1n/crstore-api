@@ -165,3 +165,8 @@
 ::ffff:127.0.0.1 - - [29/Jul/2022:20:55:45 +0000] "GET /items HTTP/1.1" 200 61 "-" "Thunder Client (https://www.thunderclient.com)"
 ::ffff:127.0.0.1 - - [29/Jul/2022:20:55:45 +0000] "GET /items HTTP/1.1" 200 61 "-" "Thunder Client (https://www.thunderclient.com)"
 ::ffff:127.0.0.1 - - [29/Jul/2022:20:56:14 +0000] "GET /items HTTP/1.1" 200 53 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [01/Aug/2022:19:55:47 +0000] "GET /users/register HTTP/1.1" 404 29 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [01/Aug/2022:19:55:49 +0000] "GET /users/register HTTP/1.1" 404 29 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [01/Aug/2022:19:55:49 +0000] "GET /users/register HTTP/1.1" 404 29 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [01/Aug/2022:19:56:22 +0000] "POST /users/register HTTP/1.1" 200 372 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [01/Aug/2022:19:57:06 +0000] "POST /users/login HTTP/1.1" 200 250 "-" "Thunder Client (https://www.thunderclient.com)"

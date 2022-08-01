@@ -14,6 +14,11 @@ const User = sequelize.define(
       allowNull: false,
       unique: true
     },
+    cpf:{
+      type: DataTypes.STRING(14),
+      allowNull: false,
+      unique: true
+    },
     name: {
       type: DataTypes.STRING(200),
       allowNull: false
@@ -35,7 +40,8 @@ const User = sequelize.define(
       type: DataTypes.STRING, // admin ou customer
       allowNull: false,
       defaultValue: 'customer'
-    }
+    },
+   
   },
   {
     freezeTableName: true,

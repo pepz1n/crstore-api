@@ -1,8 +1,8 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config";
 
-const Item = sequelize.define(
-  'items',
+const Payment = sequelize.define(
+  'payments',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -11,11 +11,8 @@ const Item = sequelize.define(
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false
-    },
-    price: {
-      type: DataTypes.NUMERIC(15,2),
-      allowNull: false
+      allowNull: false,
+      unique: true
     }
   },
   {
@@ -26,4 +23,4 @@ const Item = sequelize.define(
   }
 );
 
-export default Item;
+export default Payment;
