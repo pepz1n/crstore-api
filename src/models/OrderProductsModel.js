@@ -28,6 +28,8 @@ const OrderProducts = sequelize.define(
 Order.belongsToMany(Product, {
   through: OrderProducts,
   as: 'order',
+  onDelete: 'NO ACTION',
+  onUpdate: 'NO ACTION',
   foreignKey:{
     name: 'idOrder',
     field: 'id_order',
@@ -37,6 +39,8 @@ Order.belongsToMany(Product, {
 Product.belongsToMany(Order, {
   through: OrderProducts,
   as: 'product',
+  onDelete: 'NO ACTION',
+  onUpdate: 'NO ACTION',
   foreignKey:{
     name: 'idProduct',
     field: 'id_product',
