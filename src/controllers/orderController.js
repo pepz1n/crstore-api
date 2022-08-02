@@ -290,10 +290,14 @@ const ordersCatchedByU = async(req, res) => {
         idUserDeliver: decodedToken.userId
       }
     })
+    let orderNotDelivered = []
+    orders.forEach(order =>{
+      orderNotDelivered.push(order)
+    })
     return res.status(200).send({
       type: 'success', // success, error, warning, info
       message: 'Orders que voce pegou:', // mensagem para o front exibir
-      data: orders
+      data: orderNotDelivered
     })
   } catch (error) {
     return res.status(200).send({
