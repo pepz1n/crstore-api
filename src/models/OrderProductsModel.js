@@ -14,11 +14,6 @@ const OrderProducts = sequelize.define(
     price_products: {
       type: DataTypes.NUMERIC,
       allowNull: false
-    },
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull:false,
-      defaultValue: 1
     }
   },
   {
@@ -32,7 +27,7 @@ const OrderProducts = sequelize.define(
 
 Order.belongsToMany(Product, {
   through: OrderProducts,
-  as: 'order',
+  as: 'products',
   onDelete: 'NO ACTION',
   onUpdate: 'NO ACTION',
   foreignKey:{
@@ -43,7 +38,7 @@ Order.belongsToMany(Product, {
 })
 Product.belongsToMany(Order, {
   through: OrderProducts,
-  as: 'product',
+  as: 'order',
   onDelete: 'NO ACTION',
   onUpdate: 'NO ACTION',
   foreignKey:{

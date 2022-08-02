@@ -87,13 +87,19 @@ const persist = async (req, res) => {
 
 const create = async (token, data, res) => {
   try {
-    // let { zip_code, state, city, street, district, number } = data;
+    let { zip_code, state, city, street, district, number } = data;
    
 
 
-    // let response = await Adress.create({
-    //   name
-    // })
+    let response = await Adress.create({
+      zip_code,
+      state,
+      city,
+      street,
+      district,
+      number,
+      idUser: token
+    })
 
     return res.status(200).send({
       type: 'success', // success, error, warning, info
@@ -112,26 +118,26 @@ const create = async (token, data, res) => {
 
 const update = async (id, datas, res) => {
   try {
-    let Adress = await Adress.findOne({
+    let response = await Adress.findOne({
       where: {
         id
       }
     })
-    if (!Adress) {
+    if (!response) {
       return res.status(200).send({
         type: 'error',
         message: `Não foi encontrado categorias com o id ${id}`
       });
     }
 
-    Object.keys(datas).forEach(data => Adress[data] = datas[data])
+    Object.keys(datas).forEach(data => response[data] = datas[data])
 
-    await Adress.save()
+    await response.save()
 
     return res.status(200).send({
       type: 'success', // success, error, warning, info
       message: 'Registros atualizados com sucesso', // mensagem para o front exibir
-      data: Adress // json com informações de resposta
+      data: response // json com informações de resposta
     });
   } catch (error) {
     return res.status(200).send({
@@ -155,13 +161,13 @@ const delet = async (req, res) => {
       });
     }
 
-    let Adress = await Adress.findOne({
+    let response = await Adress.findOne({
       where: {
         id: id
       }
     })
 
-    if (!Adress) {
+    if (!response) {
       return res.status(200).send({
         type: 'warning',
         message: `Não foi encontrada categoria com o id ${id}`,
@@ -169,7 +175,7 @@ const delet = async (req, res) => {
     }
 
 
-    await Adress.destroy()
+    await response.destroy()
     return res.status(200).send({
       type: 'sucess',
       message: `registro com o id ${id} deletado com sucesso`,

@@ -14,9 +14,10 @@ const Order = sequelize.define(
     },
     status: {
       type: DataTypes.STRING,
+      defaultValue:"criado"
     },
     total: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.NUMERIC,
     }
   },
   {
@@ -44,7 +45,7 @@ Order.belongsTo(User, {
   onUpdate: 'NO ACTION',
   foreignKey: {
     name: 'idUserDeliver',
-    allowNull: false,
+    allowNull: true,
     field: 'id_user_deliver'
   }
 })
