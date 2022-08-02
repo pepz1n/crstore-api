@@ -1,13 +1,13 @@
 import Category from "../models/CategoryModel";
 
 
-const getAll = async (req, res) =>{
+const getAll = async (req, res) => {
   try {
-    
+
     const response = await Category.findAll({
       order: [['id', 'asc']]
     })
-    
+
     return res.status(200).send({
       type: 'success', // success, error, warning, info
       message: 'Registros recuperados com sucesso', // mensagem para o front exibir
@@ -18,35 +18,35 @@ const getAll = async (req, res) =>{
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
       data: error
-    });  
+    });
   }
 }
 
-const getById = async (req, res) =>{
+const getById = async (req, res) => {
   try {
-    let {id} = req.params
+    let { id } = req.params
     id = id.toString()
     id = id.replace(/\D/g, '');
 
-    if(!id){
+    if (!id) {
       return res.status(200).send({
         type: 'warning',
         message: 'Informe um ID valido para consulta'
-      });  
+      });
     }
 
     const response = await Category.findOne({
       where: {
         id
-      } 
+      }
     })
-    if(!response){
+    if (!response) {
       return res.status(200).send({
         type: 'warning',
         message: `Não foi encontrado registro com o id = ${id}`
-      });  
+      });
     }
-    
+
     return res.status(200).send({
       type: 'success', // success, error, warning, info
       message: 'Registro recuperado com sucesso', // mensagem para o front exibir
@@ -57,35 +57,35 @@ const getById = async (req, res) =>{
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
       data: error
-    }); 
+    });
   }
 }
 
 
-const persist = async (req,res) =>{
+const persist = async (req, res) => {
   try {
     let { id } = req.params;
-    if(!id){
+    if (!id) {
       return await create(req.body, res)
     }
-    return await update (id, req.body, res)
+    return await update(id, req.body, res)
   } catch (error) {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
       data: error
-    }); 
+    });
   }
 }
 
-const create = async (data, res) =>{
+const create = async (data, res) => {
   try {
-    let {name} = data;
+    let { name } = data;
 
     let response = await Category.create({
       name
     })
-   
+
     return res.status(200).send({
       type: 'success', // success, error, warning, info
       message: 'Registro criado com sucesso', // mensagem para o front exibir
@@ -97,28 +97,28 @@ const create = async (data, res) =>{
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
       data: error
-    }); 
+    });
   }
 }
 
-const update = async (id, datas, res) =>{
+const update = async (id, datas, res) => {
   try {
     let category = await Category.findOne({
       where: {
         id
       }
     })
-    if(!category){
+    if (!category) {
       return res.status(200).send({
         type: 'error',
         message: `Não foi encontrado categorias com o id ${id}`
-      }); 
+      });
     }
 
     Object.keys(datas).forEach(data => category[data] = datas[data])
 
     await category.save()
-   
+
     return res.status(200).send({
       type: 'success', // success, error, warning, info
       message: 'Registros atualizados com sucesso', // mensagem para o front exibir
@@ -129,34 +129,34 @@ const update = async (id, datas, res) =>{
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
       data: error
-    }); 
+    });
   }
 }
 
 
-const delet = async (req, res) =>{
+const delet = async (req, res) => {
   try {
     let { id } = req.body
     id = id.toString()
-    id = id ? id.replace(/\D/g,'') : null
-    if (!id){
+    id = id ? id.replace(/\D/g, '') : null
+    if (!id) {
       return res.status(200).send({
         type: 'warning',
         message: 'Informe um id válido para deletar a categoria',
-      }); 
+      });
     }
 
     let category = await Category.findOne({
-      where:{
+      where: {
         id: id
       }
     })
 
-    if(!category){
+    if (!category) {
       return res.status(200).send({
         type: 'warning',
         message: `Não foi encontrada categoria com o id ${id}`,
-      }); 
+      });
     }
 
 
@@ -164,18 +164,18 @@ const delet = async (req, res) =>{
     return res.status(200).send({
       type: 'sucess',
       message: `registro com o id ${id} deletado com sucesso`,
-    }); 
+    });
 
   } catch (error) {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
       data: error
-    }); 
+    });
   }
 }
 
-export default{
+export default {
   getAll,
   persist,
   getById,
