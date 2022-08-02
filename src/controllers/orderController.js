@@ -36,6 +36,43 @@ const getAll = async (req, res) =>{
   }
 }
 
+const getAllByToken = async (req, res) =>{
+  try {
+      
+    const authorization = req.headers.authorization;
+      const token = authorization.split(' ')[1] || null;
+      const decodedToken = Jwt.decode(token);
+      const orders = await Order.findAll({
+        where: {
+          id: decodedToken.userId
+        }
+      })
+      // console.log(orders[0]);
+      let response = []
+      for (let order of orders) {
+        console.log(order);
+        let product = await order.getProducts()
+        // console.log(order);
+        order = order.toJSON()
+        console.log(order);
+        order.product = product
+        response.push(order)
+      }
+      return res.status(200).send({
+        type: 'sucess',
+        message: `Registros Recuperados com sucesso`,
+        data: response
+      });
+  } catch (error) {
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error.message
+    });
+  }
+}
+
+
 
 
 //getById
@@ -342,5 +379,6 @@ export default{
   avaiableCatchOrders,
   getOrder,
   ordersCatchedByU,
-  cancelCatchOrder
+  cancelCatchOrder,
+  getAllByToken
 };

@@ -9,6 +9,7 @@ export default (app) => {
   app.post('/order/cancel-corrida', Controller.cancelCatchOrder)
   app.post('/order/destroy', Controller.deletar)
   app.get('/order/get-order-avaiable', Controller.avaiableCatchOrders)
+  app.get('/order/get-all-orders-by-token', Controller.getAllByToken)
   app.get('/order/:id', Controller.getById)
   app.post('/order/:id', Controller.persistir)
 }
