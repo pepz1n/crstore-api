@@ -2,6 +2,29 @@ import User from "../models/UserModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+const dualGet = async (req,res) =>{ 
+  try{
+    let { id } = req.params
+
+    id = id ? id.toString().replace(/\D/g, '') :null
+
+    if(!id){
+      return await getAll(req, res)
+    }else{
+      return await getById(id, req, res)
+    }
+  }catch(error){
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error
+    });
+  }
+}
+
+
+
+
 const getAll = async (req, res) => {
   try {
     const response = await User.findAll({
@@ -21,9 +44,56 @@ const getAll = async (req, res) => {
   }
 }
 
-const register = async (req, res) => {
+
+const getById = async (id, req, res) =>{
   try {
-    let { username, name, phone, password, role, cpf } = req.body;
+    let response = await User.findOne({
+      where:{
+        id
+      }
+    })
+
+    if (!response) {
+      return res.status(200).send({
+        type: 'warning',
+        message: 'Não foi encontrado usuario com este ID',
+      });
+    }
+    
+    return res.status(200).send({
+      type: 'sucess',
+      message: 'Usuario encontrado',
+      data: response
+    });
+
+  } catch (error) {
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error
+    });
+  }
+}
+
+const persist = async (req, res) => {
+  try {
+    let { id } = req.params;
+    if (!id) {
+      return await register(req.body, res)
+    }
+    return await update(id, req.body, res)
+  } catch (error) {
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error
+    });
+  }
+}
+
+const register = async (data, res) => {
+  try {
+    let { username, name, phone, password, role, cpf } = data;
 
     let userExists = await User.findOne({
       where: {
@@ -59,6 +129,47 @@ const register = async (req, res) => {
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
       data: error.message
+    });
+  }
+}
+
+const update = async (id, data, res) => {
+  try {
+    let response = await User.findOne({
+      where: {
+        id
+      }
+    })
+    // console.log(response);
+    if (!response) {
+      return res.status(200).send({
+        type: 'error',
+        message: `Não foi encontrado categorias com o id ${id}`
+      });
+    }
+    console.log(Object.keys(data));
+    console.log(data);
+    
+    Object.keys(data).forEach(datas => {
+      response[datas] = data[datas]
+      if (datas == "username") {
+        response.token = null
+      }
+    })
+    
+    // console.log(response);
+    await response.save()
+
+    return res.status(200).send({
+      type: 'success', // success, error, warning, info
+      message: 'Registros atualizados com sucesso, logue novamente!', // mensagem para o front exibir
+      data: response // json com informações de resposta
+    });
+  } catch (error) {
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error
     });
   }
 }
@@ -103,8 +214,103 @@ const login = async (req, res) => {
   }
 }
 
+const delet = async (req, res) => {
+  try {
+    let { id } = req.body
+    id = id.toString()
+    id = id ? id.replace(/\D/g, '') : null
+    if (!id) {
+      return res.status(200).send({
+        type: 'warning',
+        message: 'Informe um id válido para deletar a categoria',
+      });
+    }
+
+    let response = await User.findOne({
+      where: {
+        id: id
+      }
+    })
+
+    if (!response) {
+      return res.status(200).send({
+        type: 'warning',
+        message: `Não foi encontrada categoria com o id ${id}`,
+      });
+    }
+
+
+    await response.destroy()
+    return res.status(200).send({
+      type: 'sucess',
+      message: `registro com o id ${id} deletado com sucesso`,
+    });
+
+  } catch (error) {
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error
+    });
+  }
+}
+
+const updatePassword = async(req, res) =>{
+  try {
+    let {idUser, currentPassword, newPassword} = req.body
+    
+    if(!idUser){
+      return res.status(200).send({
+        type: 'warning',
+        message: 'Informe um id válido'
+      });
+    }
+    
+    let user = await User.findOne({
+      where: {
+        id: idUser
+      }
+    })
+    
+    if(!user){
+      return res.status(200).send({
+        type: 'warning',
+        message: 'Não foi encontrado usuario com este id'
+      });
+    }
+    // console.log(user);
+    if(!(await bcrypt.compare(currentPassword, user.passwordHash))){
+      return res.status(200).send({
+        type: 'warning',
+        message: 'Senha atual incorreta'
+      });
+    }
+    console.log(user);
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    user.token = null
+    await user.save()
+
+    return res.status(200).send({
+      type: 'info',
+      message: 'Senha atualizada com sucesso, logue-se Novamente'
+    });
+
+  }catch (error) {
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error
+    });
+  }
+}
+
+
+
+
 export default {
-  getAll,
-  register,
-  login
+  dualGet,
+  persist,
+  login,
+  delet,
+  updatePassword
 }

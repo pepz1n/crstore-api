@@ -12,8 +12,13 @@ const OrderProducts = sequelize.define(
       autoIncrement: true
     },
     price_products: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.NUMERIC,
       allowNull: false
+    },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull:false,
+      defaultValue: 1
     }
   },
   {

@@ -1,7 +1,11 @@
 import controller from '../controllers/usersController'
 
 export default (app) => {
-  app.get('/users', controller.getAll)
-  app.post('/users/register', controller.register)
-  app.post('/users/login', controller.login)
+  app.get('/users', controller.dualGet)
+  app.post('/users', controller.persist)
+  app.post('/users/update-password', controller.updatePassword)
+  app.post('/users/login', controller.login),
+  app.post('/users/delete', controller.delet)
+  app.post('/users/:id', controller.persist)
+  app.get('/users/:id',controller.dualGet)
 }

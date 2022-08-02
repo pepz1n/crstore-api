@@ -15,7 +15,8 @@ const Cupom = sequelize.define(
     },
     type: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      defaultValue:"percent"
     },
     value: {
       type: DataTypes.FLOAT,
