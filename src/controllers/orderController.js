@@ -6,27 +6,27 @@ import OrderProducts from "../models/OrderProductsModel";
 import Product from "../models/ProductModel";
 import { sequelize } from "../config/";
 import { Op } from "sequelize";
-import  Jwt  from "jsonwebtoken";
+import Jwt from "jsonwebtoken";
 
-const getAll = async (req, res) =>{
+const getAll = async (req, res) => {
   try {
-      const orders = await Order.findAll()
-      // console.log(orders[0]);
-      let response = []
-      for (let order of orders) {
-        console.log(order);
-        let product = await order.getProducts()
-        // console.log(order);
-        order = order.toJSON()
-        console.log(order);
-        order.product = product
-        response.push(order)
-      }
-      return res.status(200).send({
-        type: 'sucess',
-        message: `Registros Recuperados com sucesso`,
-        data: response
-      });
+    const orders = await Order.findAll()
+    // console.log(orders[0]);
+    let response = []
+    for (let order of orders) {
+      console.log(order);
+      let product = await order.getProducts()
+      // console.log(order);
+      order = order.toJSON()
+      console.log(order);
+      order.product = product
+      response.push(order)
+    }
+    return res.status(200).send({
+      type: 'sucess',
+      message: `Registros Recuperados com sucesso`,
+      data: response
+    });
   } catch (error) {
     return res.status(200).send({
       type: 'error',
@@ -36,33 +36,33 @@ const getAll = async (req, res) =>{
   }
 }
 
-const getAllByToken = async (req, res) =>{
+const getAllByToken = async (req, res) => {
   try {
-      
+
     const authorization = req.headers.authorization;
-      const token = authorization.split(' ')[1] || null;
-      const decodedToken = Jwt.decode(token);
-      const orders = await Order.findAll({
-        where: {
-          id: decodedToken.userId
-        }
-      })
-      // console.log(orders[0]);
-      let response = []
-      for (let order of orders) {
-        console.log(order);
-        let product = await order.getProducts()
-        // console.log(order);
-        order = order.toJSON()
-        console.log(order);
-        order.product = product
-        response.push(order)
+    const token = authorization.split(' ')[1] || null;
+    const decodedToken = Jwt.decode(token);
+    const orders = await Order.findAll({
+      where: {
+        id: decodedToken.userId
       }
-      return res.status(200).send({
-        type: 'sucess',
-        message: `Registros Recuperados com sucesso`,
-        data: response
-      });
+    })
+    // console.log(orders[0]);
+    let response = []
+    for (let order of orders) {
+      console.log(order);
+      let product = await order.getProducts()
+      // console.log(order);
+      order = order.toJSON()
+      console.log(order);
+      order.product = product
+      response.push(order)
+    }
+    return res.status(200).send({
+      type: 'sucess',
+      message: `Registros Recuperados com sucesso`,
+      data: response
+    });
   } catch (error) {
     return res.status(200).send({
       type: 'error',
@@ -141,10 +141,10 @@ const persistir = async (req, res) => {
 }
 
 
-const create = async (id, dados,res) =>{
- 
-  let {products, idPayment, idCupom} = dados;
-  let totalvalue = 0  
+const create = async (id, dados, res) => {
+
+  let { products, idPayment, idCupom } = dados;
+  let totalvalue = 0
   let data = []
 
 
@@ -153,17 +153,17 @@ const create = async (id, dados,res) =>{
       where: {
         id: products[index]
       }
-    }) 
+    })
     console.log(Number(productValueForget.dataValues.price));
     totalvalue += Number(productValueForget.dataValues.price)
   }
 
   let order = await Order.create({
-    idUserCostumer:id, total:totalvalue, idPayment, idCupom
+    idUserCostumer: id, total: totalvalue, idPayment, idCupom
   })
 
   for (let index = 0; index < products.length; index++) {
-    
+
     let productExistente = await Product.findOne({
       where: {
         id: products[index]
@@ -172,14 +172,14 @@ const create = async (id, dados,res) =>{
 
     //livro não existente não pode ser emprestado
     //com isso o order é cancelado/excluido
-    if(!productExistente){
+    if (!productExistente) {
       await order.destroy()
       return res.status(400).send({
         message: `O produto id ${products[index]} não existe. O empréstimo não foi salvo!!`
       })
     }
 
-    
+
     data.push({
       nome: productExistente.name,
       preço: productExistente.price
@@ -193,22 +193,22 @@ const create = async (id, dados,res) =>{
   return res.status(200).send({
     type: 'success', // success, error, warning, info
     message: 'Registro criado com sucesso', // mensagem para o front exibir
-    data:{
+    data: {
       pedido: order,
       itens: data
-    }  
+    }
   });
 }
 
 
-const update = async (id, dados, res) =>{
+const update = async (id, dados, res) => {
   let order = await Order.findOne({
-    where:{
+    where: {
       id
     }
   });
 
-  if (!order){
+  if (!order) {
     return res.status(400).send({ type: 'error', message: `Não foi encontrada order com o id ${id}` })
   }
 
@@ -216,7 +216,7 @@ const update = async (id, dados, res) =>{
 
 
   await order.save()
-  return res.status(200).send ({
+  return res.status(200).send({
     message: `Order ${id} atualizada com sucesso`,
     data: order
   });
@@ -228,7 +228,7 @@ const deletar = async (req, res) => {
   try {
     let { id } = req.body;
     //garante que o id só vai ter NUMEROS;
-    id = id ? id.toString(): null;
+    id = id ? id.toString() : null;
     id = id ? id.replace(/\D/g, '') : null;
     if (!id) {
       return res.status(400).send({
@@ -259,15 +259,15 @@ const deletar = async (req, res) => {
 
 
 //implementar uma funcionalidade -empRoute:
-  //enviar um JSON
-  // {"idlivro": 1}
-  // retornar se está emprestado
-  // caso sim, retornar esse order
+//enviar um JSON
+// {"idlivro": 1}
+// retornar se está emprestado
+// caso sim, retornar esse order
 
-const avaiableCatchOrders = async(req, res) => { 
+const avaiableCatchOrders = async (req, res) => {
   try {
     let orders = await Order.findAll({
-      where:{
+      where: {
         idUserDeliver: null
       }
     })
@@ -286,7 +286,7 @@ const avaiableCatchOrders = async(req, res) => {
 }
 
 
-const getOrder = async(req, res) =>{
+const getOrder = async (req, res) => {
   try {
     let { orderId } = req.body
     const authorization = req.headers.authorization;
@@ -294,8 +294,8 @@ const getOrder = async(req, res) =>{
     const decodedToken = Jwt.decode(token);
 
     let response = await Order.findOne({
-      where:{ 
-        id : orderId
+      where: {
+        id: orderId
       }
     })
     response.idUserDeliver = decodedToken.userId
@@ -317,18 +317,18 @@ const getOrder = async(req, res) =>{
   }
 }
 
-const ordersCatchedByU = async(req, res) => { 
+const ordersCatchedByU = async (req, res) => {
   try {
     const authorization = req.headers.authorization;
     const token = authorization.split(' ')[1] || null;
     const decodedToken = Jwt.decode(token);
     let orders = await Order.findAll({
-      where:{
+      where: {
         idUserDeliver: decodedToken.userId
       }
     })
     let orderNotDelivered = []
-    orders.forEach(order =>{
+    orders.forEach(order => {
       orderNotDelivered.push(order)
     })
     return res.status(200).send({
@@ -345,13 +345,13 @@ const ordersCatchedByU = async(req, res) => {
   }
 }
 
-const cancelCatchOrder = async (req, res) =>{
+const cancelCatchOrder = async (req, res) => {
   try {
-    let {orderId} = req.body
-    
+    let { orderId } = req.body
+
     let response = await Order.findOne({
-      where:{ 
-        id : orderId
+      where: {
+        id: orderId
       }
     })
     response.idUserDeliver = null
@@ -371,7 +371,9 @@ const cancelCatchOrder = async (req, res) =>{
   }
 }
 
-export default{
+
+
+export default {
   getAll,
   getById,
   persistir,
@@ -380,5 +382,5 @@ export default{
   getOrder,
   ordersCatchedByU,
   cancelCatchOrder,
-  getAllByToken
+  getAllByToken,
 };
