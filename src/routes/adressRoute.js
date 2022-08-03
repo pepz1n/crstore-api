@@ -1,10 +1,11 @@
 import adressController from "../controllers/adressController"
+import Authenticate from "../utils/Authenticate"
 
 
 export default (app) => {
-  app.post('/adress/destroy', adressController.delet)
-  app.get('/adress', adressController.getAll)
-  app.post('/adress', adressController.persist)
-  app.get('/adress/:id', adressController.getById)
-  app.post('/adress/:id', adressController.persist)
+  app.post('/adress/destroy', Authenticate, adressController.delet)
+  app.get('/adress', Authenticate, adressController.getAll)
+  app.post('/adress', Authenticate, adressController.persist)
+  app.get('/adress/:id', Authenticate, adressController.getById)
+  app.post('/adress/:id',Authenticate, adressController.persist)
 }

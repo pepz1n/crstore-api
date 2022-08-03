@@ -5,8 +5,9 @@ import Order from "../models/OrderModel";
 import OrderProducts from "../models/OrderProductsModel";
 import Product from "../models/ProductModel";
 import { sequelize } from "../config/";
-import { Op } from "sequelize";
+import { Op, Utils } from "sequelize";
 import Jwt from "jsonwebtoken";
+import getUserByToken from "../utils/getUserByToken";
 
 const getAll = async (req, res) => {
   try {
@@ -125,14 +126,12 @@ const persistir = async (req, res) => {
   try {
     let { id } = req.params;
     //caso nao tenha id, cria um novo registro
+    let user = await getUserByToken.getUserByToken(req.headers.authorization)
     if (!id) {
-      const authorization = req.headers.authorization;
-      const token = authorization.split(' ')[1] || null;
-      const decodedToken = Jwt.decode(token);
-      return await create(decodedToken.userId, req.body, res)
+      return await create(user.id, req.body, res)
     }
 
-    return await update(id, req.body, res)
+    return await update(user.id,id, req.body, res)
   } catch (error) {
     return res.status(500).send({
       message: error.message
@@ -201,10 +200,11 @@ const create = async (id, dados, res) => {
 }
 
 
-const update = async (id, dados, res) => {
+const update = async (userId,id, dados, res) => {
   let order = await Order.findOne({
     where: {
-      id
+      id,
+      idUserCostumer: userId
     }
   });
 
@@ -268,7 +268,10 @@ const avaiableCatchOrders = async (req, res) => {
   try {
     let orders = await Order.findAll({
       where: {
-        idUserDeliver: null
+        idUserDeliver: null,
+        status: {
+          [Op.ne]: 'cancelado'
+        }
       }
     })
     return res.status(200).send({
@@ -347,11 +350,13 @@ const ordersCatchedByU = async (req, res) => {
 
 const cancelCatchOrder = async (req, res) => {
   try {
+    let user = await getUserByToken.getUserByToken(req.headers.authorization)
     let { orderId } = req.body
 
     let response = await Order.findOne({
       where: {
-        id: orderId
+        id: orderId,
+        idUserDeliver: user.id
       }
     })
     response.idUserDeliver = null
@@ -360,6 +365,33 @@ const cancelCatchOrder = async (req, res) => {
     return res.status(200).send({
       type: 'sucess', // success, error, warning, info
       message: 'Você cancelou a corrida', // mensagem para o front exibir
+      data: response
+    })
+  } catch (error) {
+    return res.status(200).send({
+      type: 'error', // success, error, warning, info
+      message: 'OPS! erro', // mensagem para o front exibir
+      data: error
+    })
+  }
+}
+
+const cancelCustomerOrder = async (req, res) => {
+  try {
+    let {orderId} = req.body
+    let user = await getUserByToken.getUserByToken(req.headers.authorization)
+    let response = await Order.findOne({
+      where:{
+        idUserCostumer: user.id,
+        id: orderId
+      }
+    })
+
+    response.status = "cancelado"
+    await response.save();
+    return res.status(200).send({
+      type: 'sucess', // success, error, warning, info
+      message: 'Você cancelou o pedido', // mensagem para o front exibir
       data: response
     })
   } catch (error) {
@@ -383,4 +415,5 @@ export default {
   ordersCatchedByU,
   cancelCatchOrder,
   getAllByToken,
+  cancelCustomerOrder
 };

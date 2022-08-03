@@ -1,12 +1,16 @@
 import Adress from "../models/AdressModel";
 import  Jwt  from "jsonwebtoken";
+import Util  from "../utils/getUserByToken";
 
 
 const getAll = async (req, res) => {
   try {
+    let user = await Util.getUserByToken(req.headers.authorization)
 
     const response = await Adress.findAll({
-      order: [['id', 'asc']]
+      where: {
+        idUser: user.id
+      }
     })
 
     return res.status(200).send({
@@ -18,13 +22,14 @@ const getAll = async (req, res) => {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
-      data: error
+      data: error.message 
     });
   }
 }
 
 const getById = async (req, res) => {
   try {
+    let user = await Util.getUserByToken(req.headers.authorization)
     let { id } = req.params
     id = id.toString()
     id = id.replace(/\D/g, '');
@@ -38,7 +43,8 @@ const getById = async (req, res) => {
 
     const response = await Adress.findOne({
       where: {
-        id
+        id,
+        idUser: user.id
       }
     })
     if (!response) {
@@ -65,15 +71,11 @@ const getById = async (req, res) => {
 
 const persist = async (req, res) => {
   try {
+    let user = await Util.getUserByToken(req.headers.authorization)
     let { id } = req.params;
     if (!id) {
-      console.log(req.headers);
-      const authorization = req.headers.authorization;
-      const token = authorization.split(' ')[1] || null;
-      console.log(token);
-      const decodedToken = Jwt.decode(token);
-      console.log(decodedToken);
-      return await create(decodedToken.userId, req.body, res)
+
+      return await create(user.id, req.body, res)
     }
     return await update(id, req.body, res)
   } catch (error) {
@@ -118,9 +120,11 @@ const create = async (token, data, res) => {
 
 const update = async (id, datas, res) => {
   try {
+    let user = await Util.getUserByToken(req.headers.authorization)
     let response = await Adress.findOne({
       where: {
-        id
+        id,
+        idUser: user.id
       }
     })
     if (!response) {
@@ -151,6 +155,7 @@ const update = async (id, datas, res) => {
 
 const delet = async (req, res) => {
   try {
+    let user = await Util.getUserByToken(req.headers.authorization)
     let { id } = req.body
     id = id.toString()
     id = id ? id.replace(/\D/g, '') : null
@@ -163,7 +168,8 @@ const delet = async (req, res) => {
 
     let response = await Adress.findOne({
       where: {
-        id: id
+        id: id,
+        idUser: user.id
       }
     })
 
@@ -185,7 +191,7 @@ const delet = async (req, res) => {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
-      data: error
+      data: error.message
     });
   }
 }

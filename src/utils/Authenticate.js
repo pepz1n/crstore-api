@@ -29,10 +29,7 @@ export default async (req, res, next) => {
       })
     }
 
-    let onlyAdminPaths = [
-      '/items/destroy',
-      '/items/persist'
-    ];
+    
 
     const user = await User.findOne({
       where: {
@@ -47,12 +44,6 @@ export default async (req, res, next) => {
       })
     }
 
-    if (onlyAdminPaths.includes(req.route.path) && user.role !== 'admin') {
-      return res.status(200).send({
-        type: 'error',
-        message: 'Você não tem permissão para acessar esse recurso!'
-      })
-    }
 
     return next();
   } catch (error) {
