@@ -8,6 +8,7 @@ import { sequelize } from "../config/";
 import { Op, Utils } from "sequelize";
 import Jwt from "jsonwebtoken";
 import getUserByToken from "../utils/getUserByToken";
+import Cupom from "../models/CupomModel";
 
 const getAll = async (req, res) => {
   try {
@@ -156,9 +157,42 @@ const create = async (id, dados, res) => {
     console.log(Number(productValueForget.dataValues.price));
     totalvalue += Number(productValueForget.dataValues.price)
   }
+  let cupomIndex = null
+
+  if(idCupom){
+    let cupom = await Cupom.findOne({
+      where:{
+        code: idCupom
+      }
+    })
+    cupomIndex = cupom.id
+    
+    if(!cupomIndex){
+      cupomIndex = null
+    }else{
+      let uses = await Order.findAll({
+        where:{
+          idCupom: cupomIndex
+        }
+      })
+      if (uses.length >= cupom.uses) {
+        return res.status(200).send({
+          type: "error",
+          message: `O cupom de codigo ${idCupom} ja foi utilizado diversas vezes!`
+        })
+      }else{
+        if (cupom.type == "percent") {
+          totalvalue -= totalvalue * (cupom.value/100)
+        }else{
+          totalvalue -= cupom.value
+        }
+      }
+    }
+  }
+  
 
   let order = await Order.create({
-    idUserCostumer: id, total: totalvalue, idPayment, idCupom
+    idUserCostumer: id, total: totalvalue, idPayment, idCupom: cupomIndex
   })
 
   for (let index = 0; index < products.length; index++) {

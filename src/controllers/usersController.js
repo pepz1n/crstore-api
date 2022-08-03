@@ -1,6 +1,7 @@
 import User from "../models/UserModel";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import getUserByToken from "../utils/getUserByToken";
 
 const dualGet = async (req,res) =>{ 
   try{
@@ -77,7 +78,8 @@ const getById = async (id, req, res) =>{
 
 const persist = async (req, res) => {
   try {
-    let { id } = req.params;
+    let user = await getUserByToken.getUserByToken(req.headers.authorization)
+    let  id  = user.id
     if (!id) {
       return await register(req.body, res)
     }
@@ -169,7 +171,7 @@ const update = async (id, data, res) => {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
-      data: error
+      data: error,
     });
   }
 }
@@ -203,6 +205,7 @@ const login = async (req, res) => {
     return res.status(200).send({
       type: 'success',
       message: 'Bem-vindo! Login realizado com sucesso!',
+      data: user,
       token
     });
   } catch (error) {
@@ -257,7 +260,13 @@ const delet = async (req, res) => {
 
 const updatePassword = async(req, res) =>{
   try {
-    let {idUser, currentPassword, newPassword} = req.body
+    let userForget = await getUserByToken.getUserByToken(req.headers.authorization)
+    let idUser = userForget.id 
+    if(!idUser){
+      let {id} = req.body
+      idUser = id
+    }
+    let {currentPassword, newPassword} = req.body
     
     if(!idUser){
       return res.status(200).send({
