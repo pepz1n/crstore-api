@@ -14,10 +14,16 @@ const Order = sequelize.define(
     },
     status: {
       type: DataTypes.STRING,
-      defaultValue:"criado"
+      defaultValue: "criado"
     },
     total: {
       type: DataTypes.NUMERIC,
+    },
+    totalDiscount: {
+      field: "total_discount",
+      type: DataTypes.NUMERIC,
+      allowNull: false,
+      defaultValue: 0
     }
   },
   {

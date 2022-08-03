@@ -14,6 +14,11 @@ const OrderProducts = sequelize.define(
     price_products: {
       type: DataTypes.NUMERIC,
       allowNull: false
+    },
+    quantity :{
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
     }
   },
   {

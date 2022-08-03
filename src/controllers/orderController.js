@@ -143,7 +143,7 @@ const persistir = async (req, res) => {
 
 const create = async (id, dados, res) => {
 
-  let { products, idPayment, idCupom } = dados;
+  let { products, idPayment, idCupom, } = dados;
   let totalvalue = 0
   let data = []
 
@@ -151,14 +151,16 @@ const create = async (id, dados, res) => {
   for (let index = 0; index < products.length; index++) {
     let productValueForget = await Product.findOne({
       where: {
-        id: products[index]
+        id: products[index].produto
       }
     })
-    console.log(Number(productValueForget.dataValues.price));
-    totalvalue += Number(productValueForget.dataValues.price)
+    if(!products[index].quantidade){
+      products[index].quantidade = 1
+    }
+    totalvalue += Number(productValueForget.dataValues.price)*Number(products[index].quantidade)
   }
   let cupomIndex = null
-
+  let totalDiscount = null
   if(idCupom){
     let cupom = await Cupom.findOne({
       where:{
@@ -183,8 +185,10 @@ const create = async (id, dados, res) => {
       }else{
         if (cupom.type == "percent") {
           totalvalue -= totalvalue * (cupom.value/100)
+          totalDiscount = totalvalue * (cupom.value/100)
         }else{
           totalvalue -= cupom.value
+          totalDiscount = cupom.value
         }
       }
     }
@@ -192,14 +196,14 @@ const create = async (id, dados, res) => {
   
 
   let order = await Order.create({
-    idUserCostumer: id, total: totalvalue, idPayment, idCupom: cupomIndex
+    idUserCostumer: id, total: totalvalue, idPayment, idCupom: cupomIndex, totalDiscount: totalDiscount
   })
 
   for (let index = 0; index < products.length; index++) {
 
     let productExistente = await Product.findOne({
       where: {
-        id: products[index]
+        id: products[index].produto
       }
     })
 
@@ -215,12 +219,14 @@ const create = async (id, dados, res) => {
 
     data.push({
       nome: productExistente.name,
-      preço: productExistente.price
+      preço: productExistente.price,
+      quantidade: products[index].quantidade
     })
     await OrderProducts.create({
       idOrder: order.id,
       price_products: productExistente.price,
-      idProduct: products[index]
+      idProduct: products[index].produto,
+      quantity: products[index].quantidade
     });
   }
   return res.status(200).send({
