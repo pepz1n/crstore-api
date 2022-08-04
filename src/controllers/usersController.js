@@ -78,9 +78,12 @@ const getById = async (id, req, res) =>{
 
 const persist = async (req, res) => {
   try {
+    let { id } = req.params;
+    if (!id) {
+      return await register(req.body, res)
+    }
+    return await update(id, req.body, res)
 
-    return await register(req.body, res)
-   
   } catch (error) {
     return res.status(200).send({
       type: 'error',
@@ -127,7 +130,7 @@ const register = async (data, res) => {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
-      data: error
+      data: error.message
     });
   }
 }

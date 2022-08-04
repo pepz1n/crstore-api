@@ -115,7 +115,7 @@ const update = async (id, datas, res) => {
       });
     }
 
-    Object.keys(datas).forEach(data => Payment[data] = datas[data])
+    Object.keys(datas).forEach(data => response[data] = datas[data])
 
     await response.save()
 
@@ -128,7 +128,7 @@ const update = async (id, datas, res) => {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
-      data: error
+      data: error.message
     });
   }
 }

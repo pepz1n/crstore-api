@@ -37,7 +37,7 @@ Product.belongsTo(Category,{
   foreignKey: {
     name: 'idCategory',
     allowNull: false,
-    field: 'id_autor'
+    field: 'id_category'
   }
 })
 

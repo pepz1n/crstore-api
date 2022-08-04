@@ -117,7 +117,7 @@ const update = async (id, datas, res) => {
       });
     }
 
-    Object.keys(datas).forEach(data => Product[data] = datas[data])
+    Object.keys(datas).forEach(data => response[data] = datas[data])
 
     await response.save()
 
