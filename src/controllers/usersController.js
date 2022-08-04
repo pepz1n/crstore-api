@@ -32,7 +32,7 @@ const getAll = async (req, res) => {
       order: [['id', 'ASC']]
     });
     return res.status(200).send({
-      type: 'success', // success, error, warning, info
+      type: 'sucess', // sucess, error, warning, info
       message: 'Registros recuperados com sucesso', // mensagem para o front exibir
       data: response // json com informações de resposta
     });
@@ -78,17 +78,14 @@ const getById = async (id, req, res) =>{
 
 const persist = async (req, res) => {
   try {
-    let user = await getUserByToken.getUserByToken(req.headers.authorization)
-    let  id  = user.id
-    if (!id) {
-      return await register(req.body, res)
-    }
-    return await update(id, req.body, res)
+
+    return await register(req.body, res)
+   
   } catch (error) {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
-      data: error
+      data: error.message
     });
   }
 }
@@ -122,7 +119,7 @@ const register = async (data, res) => {
     });
 
     return res.status(200).send({
-      type: 'success',
+      type: 'sucess',
       message: 'Usuário cadastrastado com sucesso!',
       data: response
     });
@@ -130,7 +127,7 @@ const register = async (data, res) => {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
-      data: error.message
+      data: error
     });
   }
 }
@@ -163,7 +160,7 @@ const update = async (id, data, res) => {
     await response.save()
 
     return res.status(200).send({
-      type: 'success', // success, error, warning, info
+      type: 'sucess', // sucess, error, warning, info
       message: 'Registros atualizados com sucesso, logue novamente!', // mensagem para o front exibir
       data: response // json com informações de resposta
     });
@@ -203,7 +200,7 @@ const login = async (req, res) => {
     await user.save();
 
     return res.status(200).send({
-      type: 'success',
+      type: 'sucess',
       message: 'Bem-vindo! Login realizado com sucesso!',
       data: user,
       token
