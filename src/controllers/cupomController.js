@@ -116,26 +116,26 @@ const create = async (data, res) => {
 
 const update = async (id, datas, res) => {
   try {
-    let Cupom = await Cupom.findOne({
+    let cupom = await Cupom.findOne({
       where: {
         id
       }
     })
-    if (!Cupom) {
+    if (!cupom) {
       return res.status(200).send({
         type: 'error',
         message: `Não foi encontrado categorias com o id ${id}`
       });
     }
 
-    Object.keys(datas).forEach(data => Cupom[data] = datas[data])
+    Object.keys(datas).forEach(data => cupom[data] = datas[data])
 
-    await Cupom.save()
+    await cupom.save()
 
     return res.status(200).send({
       type: 'success', // success, error, warning, info
       message: 'Registros atualizados com sucesso', // mensagem para o front exibir
-      data: Cupom // json com informações de resposta
+      data: cupom // json com informações de resposta
     });
   } catch (error) {
     return res.status(200).send({
