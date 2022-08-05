@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config";
+import Adress from "./AdressModel";
 import Cupom from "./CupomModel";
 import Payment from "./PaymentsModel";
 import User from "./UserModel";
@@ -22,8 +23,8 @@ const Order = sequelize.define(
     totalDiscount: {
       field: "total_discount",
       type: DataTypes.NUMERIC,
-      allowNull: false,
-      defaultValue: 0
+      allowNull: true,
+      defaultValue: 0.00
     }
   },
   {
@@ -53,6 +54,17 @@ Order.belongsTo(User, {
     name: 'idUserDeliver',
     allowNull: true,
     field: 'id_user_deliver'
+  }
+})
+
+Order.belongsTo(Adress,{
+  as : 'adress',
+  onDelete: 'NO ACTION',
+  onUpdate: 'NO ACTION',
+  foreignKey: {
+    name: 'idAdress',
+    allowNull: true,
+    field: 'id_adress'
   }
 })
 

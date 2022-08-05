@@ -12,16 +12,20 @@ import Cupom from "../models/CupomModel";
 
 const getAll = async (req, res) => {
   try {
-    const orders = await Order.findAll()
+    const orders = await Order.findAll({})
     // console.log(orders[0]);
     let response = []
     for (let order of orders) {
       console.log(order);
+      let customer = await order.getUserCostumer()
+      let deliver = await order.getUserDeliver()
       let product = await order.getProducts()
       // console.log(order);
       order = order.toJSON()
       console.log(order);
       order.product = product
+      order.idUserCostumer = customer
+      order.idUserDeliver = deliver
       response.push(order)
     }
     return res.status(200).send({
@@ -53,11 +57,15 @@ const getAllByToken = async (req, res) => {
     let response = []
     for (let order of orders) {
       console.log(order);
+      let customer = await order.getUserCostumer()
+      let deliver = await order.getUserDeliver()
       let product = await order.getProducts()
       // console.log(order);
       order = order.toJSON()
       console.log(order);
       order.product = product
+      order.idUserCostumer = customer
+      order.idUserDeliver = deliver
       response.push(order)
     }
     return res.status(200).send({
@@ -105,9 +113,13 @@ const getById = async (req, res) => {
     }
 
     let response = order.toJSON();
-    response.product = await order.getProducts({
-      attributes: ['id', 'name'],
-    });
+    let customer = await order.getUserCostumer()
+    let deliver = await order.getUserDeliver()
+    let product = await order.getProducts()
+    response.product = product
+    response.idUserCostumer = customer
+    response.idUserDeliver = deliver
+      // console.log(order);
 
     return res.status(200).send({
       type: 'sucess',

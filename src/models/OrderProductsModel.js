@@ -41,6 +41,7 @@ Order.belongsToMany(Product, {
     allowNull: false
   }
 })
+
 Product.belongsToMany(Order, {
   through: OrderProducts,
   as: 'order',
@@ -52,4 +53,5 @@ Product.belongsToMany(Order, {
     allowNull: false
   }
 })
+
 export default OrderProducts;

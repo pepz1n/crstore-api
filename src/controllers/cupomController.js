@@ -159,13 +159,13 @@ const delet = async (req, res) => {
       });
     }
 
-    let Cupom = await Cupom.findOne({
+    let cupom = await Cupom.findOne({
       where: {
         id: id
       }
     })
 
-    if (!Cupom) {
+    if (!cupom) {
       return res.status(200).send({
         type: 'warning',
         message: `Não foi encontrada categoria com o id ${id}`,
@@ -173,7 +173,7 @@ const delet = async (req, res) => {
     }
 
 
-    await Cupom.destroy()
+    await cupom.destroy()
     return res.status(200).send({
       type: 'sucess',
       message: `registro com o id ${id} deletado com sucesso`,
@@ -183,7 +183,7 @@ const delet = async (req, res) => {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
-      data: error
+      data: error.message
     });
   }
 }
