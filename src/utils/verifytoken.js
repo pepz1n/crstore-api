@@ -44,10 +44,18 @@ export default async (req, res, next) => {
         message: 'Usuário não encontrado'
       })
     }
-
+    if(user.role !== 'admin') {
+      return res.status(200).send({
+        type: 'unauthorized',
+        message: 'User sem permissão',
+        name: user.username
+      })
+    }
+    
 
     return res.status(200).send({
-      type: 'authorized'
+      type: 'authorized',
+      name: user.username
     })
   } catch (unauthorized) {
     return res.status(200).send({
