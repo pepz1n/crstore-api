@@ -30,8 +30,7 @@ export default async (req, res, next) => {
       })
     }
 
-    
-
+  
     const user = await User.findOne({
       where: {
         id: decodedToken.userId
@@ -44,6 +43,16 @@ export default async (req, res, next) => {
         message: 'Usuário não encontrado'
       })
     }
+
+    if(user.role == "deliver"){
+      return res.status(200).send({
+        type: 'unauthorized',
+        message: 'User sem permissão',
+        role: "deliver",
+        name: user.username
+      })
+    }
+
     if(user.role !== 'admin') {
       return res.status(200).send({
         type: 'unauthorized',

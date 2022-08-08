@@ -15,5 +15,5 @@ import OrderProducts from "./OrderProductsModel";
   // await Adress.sync({ force:true })
   // await Product.sync({ force: true })
   // await Order.sync({ force: true })
-  // await OrderProducts.sync({ force: true})
+  // await OrderProducts.sync({ force: true })
 })();

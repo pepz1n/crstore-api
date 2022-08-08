@@ -44,13 +44,11 @@ const getAll = async (req, res) => {
 
 const getAllByToken = async (req, res) => {
   try {
-
-    const authorization = req.headers.authorization;
-    const token = authorization.split(' ')[1] || null;
-    const decodedToken = Jwt.decode(token);
+    let user = await getUserByToken.getUserByToken(req.headers.authorization)
+    console.log(user);
     const orders = await Order.findAll({
       where: {
-        id: decodedToken.userId
+        idUserCostumer: user.id
       }
     })
     // console.log(orders[0]);
@@ -113,12 +111,15 @@ const getById = async (req, res) => {
     }
 
     let response = order.toJSON();
+    let adress = await order.getAdress()
+    order.idAdress = adress
     let customer = await order.getUserCostumer()
     let deliver = await order.getUserDeliver()
     let product = await order.getProducts()
     response.product = product
     response.idUserCostumer = customer
     response.idUserDeliver = deliver
+    response.idAdress = adress
       // console.log(order);
 
     return res.status(200).send({
@@ -155,7 +156,7 @@ const persistir = async (req, res) => {
 
 const create = async (id, dados, res) => {
 
-  let { products, idPayment, idCupom, } = dados;
+  let { products, idPayment, idCupom, idAdress } = dados;
   let totalvalue = 0
   let data = []
 
@@ -196,8 +197,8 @@ const create = async (id, dados, res) => {
         })
       }else{
         if (cupom.type == "percent") {
-          totalvalue -= totalvalue * (cupom.value/100)
           totalDiscount = totalvalue * (cupom.value/100)
+          totalvalue -= totalvalue * (cupom.value/100)
         }else{
           totalvalue -= cupom.value
           totalDiscount = cupom.value
@@ -208,7 +209,7 @@ const create = async (id, dados, res) => {
   
 
   let order = await Order.create({
-    idUserCostumer: id, total: totalvalue, idPayment, idCupom: cupomIndex, totalDiscount: totalDiscount
+    idUserCostumer: id, total: totalvalue, idPayment, idCupom: cupomIndex, totalDiscount: totalDiscount, idAdress
   })
 
   for (let index = 0; index < products.length; index++) {
@@ -323,13 +324,28 @@ const avaiableCatchOrders = async (req, res) => {
         idUserDeliver: null,
         status: {
           [Op.ne]: 'cancelado'
+        },
+        idAdress:{
+          [Op.ne]: null
         }
       }
     })
+    let response = []
+    for (let order of orders) {
+      console.log(order);
+      let customer = await order.getUserCostumer()
+      let adress = await order.getAdress()
+      // console.log(order);
+      order = order.toJSON()
+      console.log(order);
+      order.idAdress = adress
+      order.idUserCostumer = customer
+      response.push(order)
+    }
     return res.status(200).send({
       type: 'success', // success, error, warning, info
       message: 'Orders Disponiveis para entrega', // mensagem para o front exibir
-      data: orders
+      data: response
     })
   } catch (error) {
     return res.status(200).send({
@@ -379,13 +395,26 @@ const ordersCatchedByU = async (req, res) => {
     const decodedToken = Jwt.decode(token);
     let orders = await Order.findAll({
       where: {
-        idUserDeliver: decodedToken.userId
+        idUserDeliver: decodedToken.userId,
+        status: {
+          [Op.ne]: 'cancelado'
+        },
+        status: {
+          [Op.ne]: 'entregue'
+        }
       }
     })
     let orderNotDelivered = []
-    orders.forEach(order => {
+    for (let order of orders){
+      let customer = await order.getUserCostumer()
+      let adress = await order.getAdress()
+      // console.log(order);
+      order = order.toJSON()
+      console.log(order);
+      order.idAdress = adress
+      order.idUserCostumer = customer
       orderNotDelivered.push(order)
-    })
+    }
     return res.status(200).send({
       type: 'success', // success, error, warning, info
       message: 'Orders que voce pegou:', // mensagem para o front exibir
@@ -450,7 +479,69 @@ const cancelCustomerOrder = async (req, res) => {
     return res.status(200).send({
       type: 'error', // success, error, warning, info
       message: 'OPS! erro', // mensagem para o front exibir
-      data: error
+      data: error.message
+    })
+  }
+}
+
+const getAllDelivered = async (req, res) =>{
+  try {
+    const authorization = req.headers.authorization;
+    const token = authorization.split(' ')[1] || null;
+    const decodedToken = Jwt.decode(token);
+    let orders = await Order.findAll({
+      where: {
+        idUserDeliver: decodedToken.userId,
+        status: 'entregue'
+      }
+    })
+    let orderDelivered = []
+    for (let order of orders){
+      let customer = await order.getUserCostumer()
+      let adress = await order.getAdress()
+      // console.log(order);
+      order = order.toJSON()
+      console.log(order);
+      order.idAdress = adress
+      order.idUserCostumer = customer
+      orderDelivered.push(order)
+    }
+    return res.status(200).send({
+      type: 'success', // success, error, warning, info
+      message: 'Orders que voce pegou:', // mensagem para o front exibir
+      data: orderDelivered
+    })
+  }catch(error){
+    return res.status(200).send({
+      type: 'error', // success, error, warning, info
+      message: 'OPS! erro', // mensagem para o front exibir
+      data: error.message
+    })
+  }
+}
+
+const confirmOrder = async (req, res) => {
+  try {
+    let { orderId } = req.body
+    let response = await Order.findOne({
+      where: {
+        id: orderId
+      }
+    })
+    response.status = "entregue"
+    await response.save()
+
+    return res.status(200).send({
+      type: 'sucess', // success, error, warning, info
+      message: 'Entregou o pedido', // mensagem para o front exibir
+      data: response
+    })
+
+  } catch (error) {
+    return res.status(200).send({
+      type: 'error', // success, error, warning, info
+      message: 'OPS! erro', // mensagem para o front exibir
+      data: error.message
     })
   }
 }
@@ -467,5 +558,7 @@ export default {
   ordersCatchedByU,
   cancelCatchOrder,
   getAllByToken,
-  cancelCustomerOrder
+  cancelCustomerOrder,
+  getAllDelivered,
+  confirmOrder,
 };
