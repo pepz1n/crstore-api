@@ -77,7 +77,7 @@ const persist = async (req, res) => {
 
       return await create(user.id, req.body, res)
     }
-    return await update(id, req.body, res)
+    return await update(id, user.id ,req.body, res)
   } catch (error) {
     return res.status(200).send({
       type: 'error',
@@ -92,16 +92,17 @@ const create = async (token, data, res) => {
     let { zip_code, state, city, street, district, number } = data;
    
 
-
+    console.log(data);
     let response = await Adress.create({
       zip_code,
       state,
       city,
       street,
       district,
-      number,
+      number_forget: number,
       idUser: token
     })
+    console.log(response);
 
     return res.status(200).send({
       type: 'success', // success, error, warning, info
@@ -118,9 +119,9 @@ const create = async (token, data, res) => {
   }
 }
 
-const update = async (id, datas, res) => {
+const update = async (id,token, datas, res) => {
   try {
-    let user = await Util.getUserByToken(req.headers.authorization)
+    let user = {"id": token}
     let response = await Adress.findOne({
       where: {
         id,
@@ -147,7 +148,7 @@ const update = async (id, datas, res) => {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
-      data: error
+      data: error.message
     });
   }
 }

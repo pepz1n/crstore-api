@@ -11,7 +11,7 @@ const Adress = sequelize.define(
       autoIncrement: true
     },
     zip_code: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false
     },
     state: {
@@ -30,8 +30,8 @@ const Adress = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false
     },
-    number: {
-      type: DataTypes.INTEGER
+    number_forget: {
+      type: DataTypes.STRING
     }
   },
   {

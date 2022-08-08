@@ -25,7 +25,7 @@ export default async (req, res, next) => {
 
     if (decodedToken.exp < (Date.now() / 1000)) {
       return res.status(200).send({
-        type: 'unauthorized',
+        type: 'expired',
         message: 'Sua sessão expirou! Faça login novamente'
       })
     }

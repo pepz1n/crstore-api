@@ -23,6 +23,20 @@ const dualGet = async (req,res) =>{
   }
 }
 
+const getByToken = async (req, res) => {
+  try{
+    let userForget = await getUserByToken.getUserByToken(req.headers.authorization)
+    let idUser = userForget.id 
+    return await getById(idUser, req, res)
+  }catch(err){
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: err.message
+    });
+  }
+}
+
 
 
 
@@ -151,11 +165,11 @@ const update = async (id, data, res) => {
     }
     console.log(Object.keys(data));
     console.log(data);
-    
+    let usernameForget = false;
     Object.keys(data).forEach(datas => {
       response[datas] = data[datas]
       if (datas == "username") {
-        response.token = null
+        usernameForget = true
       }
     })
     
@@ -165,6 +179,7 @@ const update = async (id, data, res) => {
     return res.status(200).send({
       type: 'sucess', // sucess, error, warning, info
       message: 'Registros atualizados com sucesso, logue novamente!', // mensagem para o front exibir
+      usernameForget,
       data: response // json com informações de resposta
     });
   } catch (error) {
@@ -321,5 +336,6 @@ export default {
   persist,
   login,
   delet,
-  updatePassword
+  updatePassword,
+  getByToken
 }
