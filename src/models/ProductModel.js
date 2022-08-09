@@ -18,6 +18,12 @@ const Product = sequelize.define(
       type: DataTypes.NUMERIC(15,2),
       allowNull: false
     },
+    image: {
+      type: DataTypes.STRING(2000)
+    },
+    description: {
+      type: DataTypes.STRING(300),
+    }
   },
 
 

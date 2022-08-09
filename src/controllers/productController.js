@@ -80,12 +80,14 @@ const persist = async (req, res) => {
 
 const create = async (data, res) => {
   try {
-    let { name, idCategory, price } = data;
+    let { name, idCategory, price, image,description } = data;
 
     let response = await Product.create({
       name,
       idCategory,
-      price
+      price,
+      image,
+      description
     })
 
     return res.status(200).send({

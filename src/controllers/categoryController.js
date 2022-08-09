@@ -1,4 +1,5 @@
 import Category from "../models/CategoryModel";
+import Product from "../models/ProductModel";
 
 
 const getAll = async (req, res) => {
@@ -7,7 +8,39 @@ const getAll = async (req, res) => {
     const response = await Category.findAll({
       order: [['id', 'asc']]
     })
+    let responseArray = []
+    for(let category of response){
+      let products = await Product.findAll({
+        where: {
+          idCategory: category.id
+        }
+      })
+      category = category.toJSON()
+      category.products = products
+      if(products.length){
+        responseArray.push(category)
+      }
+    }
+    console.log(responseArray);
+    return res.status(200).send({
+      type: 'success', // success, error, warning, info
+      message: 'Registros recuperados com sucesso', // mensagem para o front exibir
+      data: responseArray // json com informações de resposta
+    });
+  } catch (error) {
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error.message
+    });
+  }
+}
+const getAllCategories = async (req, res) => {
+  try {
 
+    const response = await Category.findAll({
+      order: [['id', 'asc']]
+    })
     return res.status(200).send({
       type: 'success', // success, error, warning, info
       message: 'Registros recuperados com sucesso', // mensagem para o front exibir
@@ -17,7 +50,7 @@ const getAll = async (req, res) => {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
-      data: error
+      data: error.message
     });
   }
 }
@@ -179,5 +212,7 @@ export default {
   getAll,
   persist,
   getById,
-  delet
+  delet,
+  getAllCategories
+
 }
