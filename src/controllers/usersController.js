@@ -328,6 +328,103 @@ const updatePassword = async(req, res) =>{
   }
 }
 
+const addCart = async (req, res) =>{
+  try{
+    let {quantidade, idProduct,description,idCategory, image, name, price} = req.body
+    let userForget = await getUserByToken.getUserByToken(req.headers.authorization)
+    let idUser = userForget.id 
+    let currentCart = await User.findOne({
+      where:{
+        id: idUser
+      }
+    })
+    let userJSON = currentCart.toJSON()
+    let userCart= userJSON.cart
+    if(!currentCart.cart){
+      currentCart.cart = [{produto: idProduct, quantidade, description,idCategory,image,name,price}]
+      await currentCart.save()
+      return res.status(200).send({
+        type: 'success',
+        message: 'Produto Adicionado ao carrinho',
+        data: currentCart
+      });
+    }else{
+      for(let produto of userCart){
+        console.log(produto);
+        if (produto.produto == idProduct) {
+          produto.quantidade += quantidade
+          currentCart.cart = userCart
+          await currentCart.save()
+          return res.status(200).send({
+          type: 'success',
+          message: 'Produto Adicionado ao carrinho',
+          data: currentCart
+      });
+        }
+      }
+      userCart.push({produto: idProduct, quantidade,description,idCategory,image,name,price})
+      currentCart.cart = userCart
+      await currentCart.save()
+      return res.status(200).send({
+        type: 'success',
+        message: 'Produto Adicionado ao carrinho',
+        data: currentCart
+      });
+    }
+    console.log(`quantidade: ${quantidade}, produto: ${idProduct}`);
+  }catch(error){
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error.message
+    });
+  }
+}
+
+const remove = async (req, res) =>{
+  try{
+    let {quantidade, produto} = req.body
+    let userForget = await getUserByToken.getUserByToken(req.headers.authorization)
+    let idUser = userForget.id 
+    let currentCart = await User.findOne({
+      where:{
+        id: idUser
+      }
+    })
+    let userJSON = currentCart.toJSON()
+    let userCart= userJSON.cart
+    if(userCart.length > 1 ){
+      userCart.forEach((cartItem, i) =>{
+          console.log(cartItem);
+        if (cartItem.produto == produto) {
+          if(cartItem.quantidade <= quantidade){
+            cartItem = null
+          }else{
+            cartItem.quantidade = cartItem.quantidade - quantidade
+          }
+        }
+      })
+    }else{
+      if(userCart[0].quantidade <= quantidade){
+        userCart = null
+      }else{
+        userCart[0].quantidade = userCart[0].quantidade - quantidade
+      }
+    }
+    return res.status(200).send({
+      type: 'success',
+      message: 'Ops! Ocorreu um erro!',
+      data: `Produto ${produto} removido`
+    });
+  }catch(error){
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error.message
+    });
+  }
+}
+
 
 
 
@@ -337,5 +434,7 @@ export default {
   login,
   delet,
   updatePassword,
-  getByToken
+  getByToken,
+  addCart,
+  remove
 }

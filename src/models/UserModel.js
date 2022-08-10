@@ -41,6 +41,10 @@ const User = sequelize.define(
       allowNull: false,
       defaultValue: 'customer'
     },
+    cart: {
+      type: DataTypes.JSONB,
+      allowNull:true
+    }
    
   },
   {
