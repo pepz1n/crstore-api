@@ -395,10 +395,9 @@ const remove = async (req, res) =>{
     let userCart= userJSON.cart
     if(userCart.length > 1 ){
       userCart.forEach((cartItem, i) =>{
-          console.log(cartItem);
         if (cartItem.produto == produto) {
           if(cartItem.quantidade <= quantidade){
-            cartItem = null
+            userCart.splice(i, 1)
           }else{
             cartItem.quantidade = cartItem.quantidade - quantidade
           }
@@ -411,14 +410,38 @@ const remove = async (req, res) =>{
         userCart[0].quantidade = userCart[0].quantidade - quantidade
       }
     }
+    console.log(userCart);
     currentCart.cart = userCart
     await currentCart.save()
     return res.status(200).send({
       type: 'success',
-      message: 'Ops! Ocorreu um erro!',
+      message: 'Produto removido',
       data: `Produto ${produto} removido`
-    });
+    });Password
   }catch(error){
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error.message
+    });
+  }
+}
+
+const resetCarrinho = async (req, res) =>{
+  try {
+    let userForget = await getUserByToken.getUserByToken(req.headers.authorization)
+    let idUser = userForget.id 
+    let currentCart = await User.findOne({
+      where:{
+        id: idUser
+      }
+    })
+    currentCart.cart = null
+    await currentCart.save()
+    return res.status(200).send({
+      type:"success"
+    })
+  } catch (error) {
     return res.status(200).send({
       type: 'error',
       message: 'Ops! Ocorreu um erro!',
@@ -438,5 +461,6 @@ export default {
   updatePassword,
   getByToken,
   addCart,
-  remove
+  remove,
+  resetCarrinho
 }

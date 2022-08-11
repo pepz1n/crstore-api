@@ -1,4 +1,5 @@
 import Cupom from "../models/CupomModel";
+import Order from "../models/OrderModel";
 
 const dualGet = async (req,res) =>{ 
   try{
@@ -20,6 +21,48 @@ const dualGet = async (req,res) =>{
   }
 }
 
+const verify = async (req, res) =>{
+  try{
+    let {cupom} = req.body
+    let responseCupom = await Cupom.findOne({
+      where:{
+        code: cupom
+      }
+    })
+    if (!responseCupom) {
+      return res.status(200).send({
+        type: 'error',
+        message: 'Não foi encontrado cupom com o codigo',
+      });
+    }
+    let responseOrder = await Order.findAll({
+      where: {
+        idCupom: responseCupom.id
+      }
+    })
+    if(responseOrder.length >= responseCupom.uses){
+      return res.status(200).send({
+        type: 'error',
+        message: 'Cupom Com muitos usos',
+      });
+    }else{
+      return res.status(200).send({
+        type: 'success',
+        message: responseCupom,
+      });
+    }
+    return res.status(200).send({
+      type: 'error',
+      message: "erro",
+    });
+  }catch(error){
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error
+    });
+  }
+}
 
 
 const getAll = async (req, res) => {
@@ -192,5 +235,6 @@ export default {
   dualGet,
   persist,
   dualGet,
-  delet
+  delet,
+  verify
 }

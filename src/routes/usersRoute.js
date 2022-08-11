@@ -6,6 +6,7 @@ import verifytoken from '../utils/verifytoken'
 export default (app) => {
   app.get('/users', Authenticate, adminValidator, controller.dualGet)
   app.post('/users', controller.persist)
+  app.get('/reset-carrinho', Authenticate, controller.resetCarrinho)
   app.post('/users/cart', controller.addCart)
   app.post('/users/cart-remove', controller.remove)
   app.get('/users/by-token', Authenticate, controller.getByToken)

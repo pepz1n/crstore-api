@@ -4,9 +4,12 @@ import User from "../models/UserModel";
 export default async (req, res, next) => {
   try {
     let { authorization } = req.body;
+    if(!authorization){
+      authorization = req.headers.authorization;
+    }
     console.log(authorization);
 
-    if (!authorization) {
+    if (!authorization || authorization == "Bearer") {
       return res.status(200).send({
         type: 'unauthorized',
         message: 'Token não informado'
