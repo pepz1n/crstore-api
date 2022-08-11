@@ -411,6 +411,8 @@ const remove = async (req, res) =>{
         userCart[0].quantidade = userCart[0].quantidade - quantidade
       }
     }
+    currentCart.cart = userCart
+    await currentCart.save()
     return res.status(200).send({
       type: 'success',
       message: 'Ops! Ocorreu um erro!',
