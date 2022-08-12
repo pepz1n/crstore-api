@@ -109,7 +109,7 @@ const persist = async (req, res) => {
 
 const register = async (data, res) => {
   try {
-    let { username, name, phone, password, role, cpf } = data;
+    let { username, name, phone, password, role, cpf,email } = data;
 
     let userExists = await User.findOne({
       where: {
@@ -132,7 +132,8 @@ const register = async (data, res) => {
       phone,
       passwordHash,
       role,
-      cpf
+      cpf,
+      email
     });
 
     return res.status(200).send({

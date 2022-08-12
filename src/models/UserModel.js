@@ -44,6 +44,16 @@ const User = sequelize.define(
     cart: {
       type: DataTypes.JSONB,
       allowNull:true
+    },
+    email: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
+    recuperation:{
+      type: DataTypes.STRING,
+      allowNull:true,
+      expires: 3600
     }
    
   },

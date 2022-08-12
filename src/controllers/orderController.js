@@ -28,6 +28,7 @@ const getAll = async (req, res) => {
       order.idUserDeliver = deliver
       response.push(order)
     }
+    console.log(response)
     return res.status(200).send({
       type: 'sucess',
       message: `Registros Recuperados com sucesso`,
